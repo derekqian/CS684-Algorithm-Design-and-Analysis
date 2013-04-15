@@ -1,0 +1,107 @@
+\documentclass[11pt,letterpaper,oneside]{article}
+\usepackage[top=0.5in,left=1in,right=1in,bottom=1in]{geometry}
+%\usepackage[top=0.5in,left=1.8in,right=1.8in,bottom=1in]{geometry}
+\usepackage{fancyvrb}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amsmath}
+
+%\usepackage{setspace}
+%\doublespacing
+
+\title{Homework 1}
+\author{JEFFERSON}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\noindent\textbf{Question:}
+
+Consider the problem of clustering data so that things in a cluster are close together. In particular, imagine that you're given a collection of real numbers. You are asked to optimally cluster them into $k$ groups (for some fixed $k$). The ``weight'' of each group is the sum of distances between all the pairs of elements in the group (where the ``distance'' is just the absolute value of the difference). An optimal $k$-clustering is a clustering such that the sum of weights of all $k$ groups is as small as possible.
+
+For example, imagine that your numbers are
+
+\hspace{2em} $3.5, 3.5, 4, 17$
+
+In this situation, an optimal 2-clustering is
+
+\hspace{2em} $3.5, 3.5, 4 \mid 17$
+
+This clustering has total weight
+
+\hspace{2em} $(0.5 + 0.5 + 0) + (0) = 1.0$
+
+Grouping 17 with any of the other elements must result in a total weight of at least 13.
+
+\null
+
+\noindent Problems
+\vspace{-1em}
+\begin{enumerate}
+  \itemsep1pt \parskip0pt \parsep0pt
+  \item Write down a formal definition of this problem (call it ``OPTIMAL 1-DIMENSIONAL k-CLUSTERING'') in the style shown in class and in the text.
+  \item Give an algorithm that solves this problem. It need not be efficient.
+  \item What is the asymptotic worst-case complexity of your algorithm?
+  \item \textbf{[Optional]} Can you find an $O(kn^2)$ algorithm (where $n$ is the total number of elements)? An $O(kn\ lg(n))$ algorithm?
+\end{enumerate}
+
+
+\noindent\textbf{Answers:}
+\begin{enumerate}
+\item A formal definition of this problem is shown below.
+  %\begin{Verbatim}[frame=single]
+
+%\begin{tabular}{l}
+\line(1,0){400}\\
+    OPTIMAL 1-DIMENSIONAL k-CLUSTERING
+
+    \textbf{Input:} A bag of $n$ real numbers $A = [a_1, a_2, ..., a_n]$.
+
+    \textbf{Output:} Let $C$ be a set of k bags, $C = \{A_1, A_2, ..., A_k\}$, where $A_i = [a_{i_1}, a_{i_2}, ..., a_{i_{n_i}}]$, $n_i$ is the number of elements in $A_i$, $n_i > 0$. We call $C$ a clustering of $A$, if these bags meet the following requirements:
+    \begin{enumerate}
+      \item $\sum_{i=1}^{k}n_i = n$;
+      \item $\bigcup_{i=1}^{k}I_i = [1, 2, ..., n]$, where $I_i = [i_1, i_2, ..., i_{n_i}]$.
+    \end{enumerate}
+    The weight of bag $A_i$ is defined as $W(A_i) = \sum_{\substack{p \in I_i\\q \in I_i\\p<q}}D(a_p,a_q)$, where $D(a_p,a_q) = |a_p-a_q|$ is the distance between $a_p$ and $a_q$.
+    The weight of clustering C is defined as $W(C) = \sum_{i=1}^{k}W(A_i)$.
+
+    Suppose there are $m$ clusterings for bag $A$, denoted as $C_1, C_2, ..., C_m$, then the \textbf{\emph{output}} will be $C^*$, such that $W(C^*) = min(W(C_i))$.
+
+\vspace{-1em}\line(1,0){400}
+%\end{tabular}
+  %\end{Verbatim}
+\item An algorithm that solves the problem is shown below.
+
+To make our algorithm simple, we introduce an equivalent data structure for the clustering $C$. In the algorithm, we define $C$ as an array of n integers, $C = (i_1, i_2, ..., i_n)$, where $i_j \in \{1, 2, ..., k\}$, $j \in \{1, 2, ..., n\}$, $i_j$ is the group number that $a_j$ (element in $A$) belongs to. We can easily convert this format into the format introduced in the formal definition in $O(n)$ operations.
+
+\line(1,0){400}\\
+  k-CLUSTERING(A)\\
+   1 \hspace{0em} $C^* \leftarrow$ INVALID\\
+   2 \hspace{0em} $C \leftarrow (1, 1, ..., 1)$\\
+   3 \hspace{0em} while true\\
+   4 \hspace{1em}   if $C^*$ = INVALID\\
+   5 \hspace{2em}     $C^* \leftarrow C$\\
+   6 \hspace{1em}   else if $C$ is $k$-clustering and $W(C) < W(C^*)$\\
+   7 \hspace{2em}     $C^* \leftarrow C$\\
+   8 \hspace{1em}   if $C = (k, k, ..., k)$\\
+   9 \hspace{2em}     break\\
+  10 \hspace{1em}   increase($C$)\\
+  11 \hspace{0em} return $C^*$
+
+\vspace{-1em}\line(1,0){400}
+
+The function "increase'' treats $C$ as a base-$k$ integer and increase $C$ by 1 each time. For example, if $C = (1, 1, ..., 1)$, we get $(1, 1, ..., 2)$ after increase($C$), if $C = (1, ..., 1, k)$, we get $(1, ..., 2, 1)$ after increase($C$). With line 8 - 9, we can enumerate all possible clustering of $A$. We notice that this method also produce some $C$ that is not $k$-clustering, as some instance may include empty groups. However, this will not affect the final result, as these instances will not generate better result than $k$-clustering.
+
+This algorithm basically considers all possible clustering of $A$ (no larger than $k$ groups), computer their weight when they are $k$-clustering, and put the clustering with minimum weith in $C^*$. The result will be guaranteed to be the $k$-clustering with minimum weight.
+
+\item The asymptotic worst-case complexity of the above algorithm is shown below.
+  
+There are $k^n$ instances from the enumeration (line 8 - 9). So the while loop will execute for $k^n$ times. Determining $C$ is $k$-clustering or not takes $O(n)$ operations. $W(C)$ takes $O(n^2)$ operations, while increase($C$) takes $O(n)$ operations. So the total asymptotic worst-case complexity of the above algorithm will be $O(k^n(n+n^2+n)) = O(k^nn^2)$.
+
+\item optional.
+\end{enumerate}
+\end{document}
