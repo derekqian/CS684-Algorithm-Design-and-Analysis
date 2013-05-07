@@ -1,0 +1,155 @@
+\documentclass[11pt,letterpaper,oneside]{article}
+\usepackage[top=0.5in,left=1in,right=1in,bottom=1in]{geometry}
+%\usepackage[top=0.5in,left=1.8in,right=1.8in,bottom=1in]{geometry}
+\usepackage{fancyvrb}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amsmath}
+
+%\usepackage{setspace}
+%\doublespacing
+
+\title{Homework 3}
+\author{JEFFERSON}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\noindent\textbf{Question:}
+
+\vspace{-1em}
+\begin{enumerate}
+  \itemsep1pt \parskip0pt \parsep0pt
+  \item Consider the dual of the first problem described in the book. Instead of cutting rods for maximum profit, let's try buying rods at minimum cost. Assume that one can buy connectors of cost 2 that join two rods, and that rods are available for purchase at the prices listed in the following table (from the book).
+
+\begin{tabular}{cc}
+Length & Cost\\ \hline
+1 & 1\\
+2 & 5\\
+3 & 8\\
+4 & 9\\
+5 & 10\\
+6 & 17\\
+7 & 17\\
+8 & 20\\
+9 & 24\\
+10 & 30\\
+\end{tabular}
+
+\begin{enumerate} 
+\item Write pseudocode using memoization or dynamic programming for efficiently finding the cost of a minimum-cost assembly for a rod of length n.
+\item Find the big-O worst-case complexity of your algorithm.
+\item  (optional) Implement your algorithm, and show the minimum cost for assembling rods of length 1-30 given the above costs.
+\end{enumerate}
+
+  \item The main way Rabin-Karp is used today is as a way of searching for multiple pattern strings in a given target string in parallel. The basic idea is to use a Bloom filter to check whether the current rolling hash value might be one of a set of target hashes. If the Bloom filter returns positive, the hash is compared directly with each hash in the set. If a hash matches, then the pattern string is checked against the target string.
+\begin{enumerate} 
+\item Give pseudocode for the above algorithm.
+\item Assume that for a given search for p pattern strings of length m the Bloom filter has been chosen to give a false-positive probability of 0.01, and the rolling hash function's false-positive rate is 0.02. When searching a target string of length n much larger than m, what is the expected ``overhead''? The overhead is computed as:
+
+\begin{tabular}{c}
+``extra'' hash comparisons + ``extra'' character compares\\ \hline
+optimal ``      " + optimal ``         "\\
+\end{tabular}
+
+\end{enumerate}
+
+\end{enumerate}
+
+
+\noindent\textbf{Answers:}
+\begin{enumerate}
+\item A reasonable problem description for reversing the elements of an array is shown below.
+  %\begin{Verbatim}[frame=single]
+
+%\begin{tabular}{l}
+\line(1,0){400}\\
+    REVERSE D\&C
+
+    \textbf{Input:} A sequence of $n$ elements $a = [a_{0}, a_{1}, ..., a_{n-1}]$.
+
+    \textbf{Output:} A sequence of $n$ elements $b = [b_{0}, b_{1}, ..., b_{n-1}]$, such that $b$ includes all the elements in $a$ in reverse order, which means $b_{0}=a_{n-1}, b_{1}=a_{n-2}, ..., b_{n-1}=a_{0}$.
+
+\vspace{-1em}\line(1,0){400}
+%\end{tabular}
+  %\end{Verbatim}
+\item We use induction to prove the algorithm meets the problem dexcription. The prove is shown below.
+
+\line(1,0){400}
+
+    \textbf{Base:} If $n$ is 1, the algorithm return the input without any change. This result meets the problem description. Because in this case, the input is $a = [a_{0}]$, the output in the description is $b = [b_{0}]$, where $b_{0}=a_{0}$. This means the output based on the description equals to $[a_{0}]$, which is the also the output of the algorithm.
+
+    \textbf{Induction:} Suppose the algorithm output the correct result for size $k$, which means "reverse $a[0..k-1]$'', "reverse $a[k..2k-1]$" and "reverse $a[k+1...2k]$" all return the correct results according to the description. From "reverse $a[0..k-1]$" and "reverse $a[k..2k-1]$", the algorithm will construct the correct result for the input $a[1..2k-1]$. From "reverse $a[0..k-1]$" and "reverse $a[k+1..2k]$", the algorithm will construct the correct result for the input $a[0..2k]$. This means the algorithm will work for the array of size $2k$ and $2k+1$, if it works for the array with size $k$. As a result, the algorithm will work for all arrays with the size $|a|>0$.
+
+\vspace{-1em}\line(1,0){400}
+
+\item The time complexity of this algorithm is shown below.
+  
+This algorithm is implemented using recursion. We calculate the time complexity using master theorem.
+
+In the body of the algorithm, the algorithm calls itself twice with half the input size. So the time for size $n$ is shown as,
+
+$T(n) = 2T(n/2) + f(n)$
+
+The last term $f(n)$ is determined by the number of "exchange" operations in the loop. In this case, $f(n) = O(n)$.
+
+Based on master theorem, we get $T(n) = O(n\ lg(n))$.
+
+\item I implemented the algorithm in java code.
+
+The following test cases are tested. The results are shown in the table below.
+
+\begin{tabular}{rr}
+test case & output \\ \hline
+(\ ) & (\ ) \\
+(1) & (1) \\
+(1, 2) & (2, 1) \\
+(1, 2, 3) & (3, 2, 1) \\
+(1, 2, 3, 4, 5, 6, 7, 8, 9) & (9, 8, 7, 6, 5, 4, 3, 2, 1)
+\end{tabular}
+
+\null
+\null
+
+The time is test by set the input size from $2^1$ to $2^{26}$, and record the execution time in microsecond. We also calculate the ratio $n\ lg(n)/time$. The result is shown below.
+
+From the result in the table, we can see that when size $n$ increases, the time for executing the algorithm increases. When $n$ increases, we can see the ratio is nearly constant, which means the time complexity is $O(n\ lg(n))$.
+
+Thanks Bart for helping me at how to run the test program without JIT (java -Djava.compiler=NONE reverse), or the time result will be very wierd.
+
+\begin{tabular}{rrr}
+n (input size) & time (microsecond) & (n lg(n))/time (ratio)\\ \hline
+2 & 1 & 1\\
+4 & 1 & 5\\
+8 & 2 & 8\\
+16 & 4 & 11\\
+32 & 10 & 11\\
+64 & 21 & 12\\
+128 & 46 & 13\\
+256 & 100 & 14\\
+512 & 216 & 14\\
+1024 & 463 & 15\\
+2048 & 989 & 15\\
+4096 & 2128 & 16\\
+8192 & 4536 & 16\\
+16384 & 9516 & 16\\
+32768 & 19424 & 17\\
+65536 & 41817 & 17\\
+131072 & 87706 & 17\\
+262144 & 176639 & 18\\
+524288 & 368538 & 18\\
+1048576 & 746833 & 19\\
+2097152 & 1583825 & 19\\
+4194304 & 3289176 & 19\\
+8388608 & 6817273 & 19\\
+16777216 & 14019145 & 19\\
+33554432 & 29000299 & 20\\
+67108864 & 60485369 & 19
+\end{tabular}
+
+\end{enumerate}
+\end{document}
