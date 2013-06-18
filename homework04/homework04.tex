@@ -1,0 +1,156 @@
+\documentclass[11pt,letterpaper,oneside]{article}
+\usepackage[top=0.5in,left=1in,right=1in,bottom=1in]{geometry}
+%\usepackage[top=0.5in,left=1.8in,right=1.8in,bottom=1in]{geometry}
+\usepackage{fancyvrb}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amsmath}
+
+%\usepackage{setspace}
+%\doublespacing
+
+\title{Homework 4}
+\author{JEFFERSON}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\noindent\textbf{Question:}
+
+\vspace{-1em}
+\begin{enumerate}
+  \itemsep1pt \parskip0pt \parsep0pt
+  \item For applications like dynamic programming, it is often necessary to make a large array, all of whose elements are initialized to some constant value. This seems to need $O(n)$ time for the initialization. However, it can be done in amortized time $O(1)$.
+
+The basic idea is to initialize elements on first reference. The elements are kept on a stack, and the array becomes an array of indices into that stack. If the stack index at an array location is invalid, or if the stack element at that index claims to be for a different array index, then we allocate and initialize a new stack entry.
+
+There are three fundamental operations: $initialize$, $reference$, and $store$.
+
+\vspace{1em}\hspace{2em} $allocate(n, k)$:
+
+\hspace{3em}    $a.r \leftarrow$ new array of $n$ uninited indexes
+
+\hspace{3em}    $a.s \leftarrow$ new array of $n$ uninited $(v, i)$ pairs
+
+\hspace{3em}    $a.k \leftarrow k$
+ 
+\hspace{3em}    $a.sp \leftarrow 0$ 
+
+\hspace{3em}    \textbf{return} $a$
+
+\null
+
+\vspace{1em}\hspace{2em} $reference(a, i)$:
+
+\hspace{3em}    $\textbf{if}\ a.r[i] \geq 0\ \textbf{and}\ a.r[i] < a.sp\ \textbf{and}\ a.s[a.r[i]].i = i$
+
+\hspace{4em}        $\textbf{return}\ a.s[a.r[i]].v$
+
+\hspace{3em}    $a.s[a.sp].v \leftarrow a.k$
+
+\hspace{3em}    $a.s[a.sp].i \leftarrow i$ 
+
+\hspace{3em}    $a.r[i] \leftarrow a.sp$
+
+\hspace{3em}    $\textbf{increment}\ a.sp$
+
+\hspace{3em}    $\textbf{return}\ a.k$
+
+\null
+
+\vspace{1em}\hspace{2em} $store(a, i, v)$: 
+
+\hspace{3em}    $reference(a, i)$
+
+\hspace{3em}    $a.s[a.r[i]].v \leftarrow v$
+
+\null
+
+\begin{enumerate} 
+\item Show that the amortized time complexity of a sequence of operations is $O(1)$ for an array of $n$ elements. Measure whatever operations you like.
+\item Explain what modifications to the pseudocode would be necessary if you wanted each element of the array to be initialized to the value of an arbitrary function q(i) from indices to values. Would this change the time complexity?
+\end{enumerate}
+
+  \item Strassen's method is supposedly faster than classical matrix multiplication, because it trades expensive multiplies for cheap adds.
+
+Implement classical matrix multiplication and Strassen's method and time them on matrices of various sizes. Are there sizes for which Strassen's method is faster? If not, would you predict that there could be?
+
+\end{enumerate}
+
+
+\noindent\textbf{Answers:}
+\begin{enumerate}
+\item 
+\begin{enumerate}
+\item We use accounting method to show the amortized time complexity of a sequence of operations is $O(1)$ for an array of $n$ elements. We measure the store operation.
+
+The amortized cost for $allocate$, $reference$ and $store$ are shown below,
+
+$allocate$: 4 (for the four assignment statements)
+
+$reference$: 4 (for the three assignment statements and one increment statement)
+
+$store$: 5 (for reference function and one assignment statement)
+
+The actual cost for $allocate$, $reference$ and $store$ are shown below,
+
+$allocate$: 4 (for the four assignment statements)
+
+$reference$: 0 (when reference the existing value) or 4 (for the three assignment statements and one increment statement)
+
+$store$: 1 (when store a uninitialized value) or 5 (for reference function and one assignment statement)
+
+For every possible sequence of operations, the amortized cost is greater or equal to the actual cost, so the amortized cost is valid. The amortized cost for $allocate$, $reference$ and $store$ are all constant. So we showed that the amortized time complexity of a sequence of operations is $O(1)$ using accounting method.
+
+\item Assume we don't need to care about the value we never use, which means we don't need to initialize unused value. Based on this assumption, we need only change the function $reference$ to initialize the value to an arbitrary function q(i). The new function is shown below.
+
+\vspace{1em}\hspace{2em} $reference(a, i)$:
+
+\hspace{3em}    $\textbf{if}\ a.r[i] \geq 0\ \textbf{and}\ a.r[i] < a.sp\ \textbf{and}\ a.s[a.r[i]].i = i$
+
+\hspace{4em}        $\textbf{return}\ a.s[a.r[i]].v$
+
+\hspace{3em}    $a.s[a.sp].v \leftarrow q(i)$  \ \ \textbf{// this line is changed}
+
+\hspace{3em}    $a.s[a.sp].i \leftarrow i$ 
+
+\hspace{3em}    $a.r[i] \leftarrow a.sp$
+
+\hspace{3em}    $\textbf{increment}\ a.sp$
+
+\hspace{3em}    $\textbf{return}\ a.k$
+
+\null
+
+We change the forth line. Instead of $a.k$, we assign $a.s[a.sp].v$ with $q(i)$.
+
+If we can compute $q(i)$ in constant time, then this will not change the time complexity.
+
+\end{enumerate}
+
+\item I implement the algorithm in Java first. However, strassen take much longer time, and the data didn't show any clue that the strassen will overcome the naive algorithm somewhere. To see why, I tested the cost for addition and multiplication operation, and find a supprising result that addition takes almost the same time as muliplication.
+
+Next, I implement the algorithms in C. I still didn't see strassen overcome the naive algorithm. However, I see the strassen will overcome naive algorirhm at some point. The result is shown below. From the table, we can see that the ratio Strassen/Naive goes smaller when size goes larger. We can expect the ratio below 1 at some larger size.
+
+\begin{tabular}{cccc}
+Size & Naive (us) & Strassen (us) & Strassen/Naive\\ \hline
+1& 2& 1& 0.5\\
+2& 0& 3& inf\\
+4& 1& 14& 14.0\\
+8& 4& 102& 25.5\\
+16& 24& 715& 29.8\\
+32& 186& 5075& 27.3\\
+64& 1493& 35621& 23.9\\
+128& 12620& 249969& 19.8\\
+256& 93502& 1760754& 18.8\\
+512& 768400& 12314878& 16.0\\
+1024& 7747927& 86337452& 11.1\\
+\end{tabular}
+
+
+\end{enumerate}
+\end{document}
