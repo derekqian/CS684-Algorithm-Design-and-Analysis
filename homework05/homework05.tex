@@ -1,0 +1,94 @@
+\documentclass[11pt,letterpaper,oneside]{article}
+\usepackage[top=0.5in,left=1in,right=1in,bottom=1in]{geometry}
+%\usepackage[top=0.5in,left=1.8in,right=1.8in,bottom=1in]{geometry}
+\usepackage{fancyvrb}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amsmath}
+
+%\usepackage{setspace}
+%\doublespacing
+
+\title{Homework 5}
+\author{JEFFERSON}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\noindent\textbf{Question:}
+
+%\vspace{-1em}
+Consider the following pseudocode for translating a graph coloring instance into a SAT instance. The pseudocode outputs clauses of a CNF formula that is SAT if and only if the graph $G$ is colorable in $k$ colors. The atoms $v[i,c]$ of the formula are true if variable $v$ should be colored with color $c$.
+
+\vspace{1em}\hspace{2em} SAT-from-GC(graph G=(V, E), limit k colors):
+
+\hspace{3em}     -- enforce the edge constraints 
+
+\hspace{3em}     $\forall$ (v[i], v[j]) in E 
+
+\hspace{4em}         $\forall$ c in 1..k 
+
+\hspace{5em}             emit clause ($\neg$ v[i,c] $\vee$ $\neg$ v[j,c]) 
+
+\hspace{3em}     -- ensure that every vertex is colored 
+
+\hspace{3em}     $\forall$ i in 1..$|V|$ 
+
+\hspace{4em}         emit clause (v[i,1] $\vee$ v[i,2] $\vee$ .. $\vee$ v[i, k]) 
+
+\hspace{3em}     -- ensure that every vertex is uniquely colored 
+
+\hspace{3em}     $\forall$ i in 1..$|V|$ 
+
+\hspace{4em}         $\forall$ c in 1..k 
+
+\hspace{5em}             $\forall$ $c'$ in 1..k 
+
+\hspace{6em}                 if $c \neq c'$
+
+\hspace{7em}                     emit clause ($\neg$ v[i,c] $\vee$ $\neg v[i,c']$)
+
+\null
+
+\begin{enumerate}
+  \itemsep1pt \parskip0pt \parsep0pt
+  \item What is the big-O worst-case complexity of this translator? What are the metrics for input size? What operations should be counted?
+  \item Give pseudocode for the corresponding translator from a satisfying assignment (assignment of true or false to each atom) to a graph coloring.
+\end{enumerate}
+
+
+\null
+\noindent\textbf{Answers:}
+\begin{enumerate}
+\item There are three ``emit clause" invocations in this algorithm. The first one executes for $k\cdot|E|$ times, the second one executes for $|V|$ times, and the third one executes for $k^2\cdot|V|$ times in worst case. The parameter of the first ``emit clause" contains two literals, the parameter of the second one contains $k$ literals, and the parameter of the third one contains 2 literals. The algorithm need to prepare $2k\cdot|E|+k\cdot|V|+k^2\cdot|V|$ literals. Suppose preparing each literal need constant time, then the big-O worst-case complexity of this algorithm is $O(k\cdot|E|+k^2\cdot|V|)$. The metrics for the input size are the number of vertex $|V|$, the number of edges $|E|$ and the number of colors $k$. We use the preparation of literals as the operation.
+
+\item The pseudocode for translating a satisfying assignment to a graph coloring is shown below. The input of this algorithm is a list of atoms $[v(i,c) | 1\leq i \leq |V|, 1 \leq c \leq k]$ returned by the SAT solver. If the list is empty, it means there is no satisfying assignment. The algorithm returns a list of pairs, each pairs $(i,k)$ means vertex $i$ is colored with $k$. An empty list means no such assignment exists.
+
+\vspace{1em}\hspace{2em} GC-from-SAT(v):
+
+\hspace{3em}     -- go through each assignment
+
+\hspace{3em}     a $\leftarrow$ [ ]
+
+\hspace{3em}     if v is empty
+
+\hspace{4em}         return a
+
+\hspace{3em}     $\forall$ i in 1..$|V|$ 
+
+\hspace{4em}         $\forall$ c in 1..k 
+
+\hspace{5em}             if $v[i,k]$
+
+\hspace{6em}                 insert $(i,k)$ into a
+
+\hspace{3em}     return a
+
+\null
+
+\end{enumerate}
+\end{document}
