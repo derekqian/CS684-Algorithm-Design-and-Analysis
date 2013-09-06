@@ -103,7 +103,7 @@ This algorithm has a doubly-nested loop structure. The outer loop executes for $
 
 \hspace{3em}    $m = P_1.length$
 
-\hspace{3em}    $p = P.amount$   \hspace{4em}// $P$ contains $p$ patterns denoted as $P_j$
+\hspace{3em}    $p = P.size$   \hspace{4em}// $P$ contains $p$ patterns denoted as $P_j$
 
 \hspace{3em}    $h = d^{m-1}\ mod\ q$
 
@@ -143,9 +143,15 @@ This algorithm has a doubly-nested loop structure. The outer loop executes for $
 
 I assume the overhead means the time used for spurious hits.
 
-``extra" hash comparisons: $0.001*(n-m)*p$
+``extra" hash comparisons: $0.001*(n-m+1)*p$
 
-``extra" character compares: $0.001*(n-m)*p * 0.02*m$
+``extra" character compares: $0.001*(n-m+1)*p * 0.02*m$
+
+``optimal" hash comparisons: $(1-0.001)*(n-m+1)$
+
+``optimal" character compares: $0.001*(n-m+1)*p * (1-0.02)$
+
+So the overhead is: $\frac{0.001*(n-m+1)*p\ +\ 0.001*(n-m+1)*p*0.02*m}{(1-0.001)*(n-m+1)\ +\ 0.001*(n-m+1)*p*(1-0.002)}$
 
 \end{enumerate}
 
